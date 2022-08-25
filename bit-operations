@@ -1,0 +1,130 @@
+#!/bin/bash
+
+BUILD_DIR=.
+
+create-template () {
+
+cat > ${BUILD_DIR}/main.c <<EOF
+#include <stdio.h>
+
+#include "bitviewer.h"
+
+int main(int argc, char *argv[]) {
+  TYPEA a = NUMA;
+  TYPEB b = NUMB;
+  TYPEB c = a OPER b;
+
+  printf("Values for a:\n");
+  printf("  On disk: ");
+  show_bytes((byte_pointer) &a, sizeof(TYPEA));
+  printf("  In order: ");
+  show_bytes_in_order((byte_pointer) &a, sizeof(TYPEA));
+  printf("  Bits: ");
+  print_all_bytes((byte_pointer) &a, sizeof(TYPEA));
+
+  printf("\n");
+
+  printf("Values for b:\n");
+  printf("  On disk: ");
+  show_bytes((byte_pointer) &b, sizeof(TYPEB));
+  printf("  In order: ");
+  show_bytes_in_order((byte_pointer) &b, sizeof(TYPEB));
+  printf("  Bits: ");
+  print_all_bytes((byte_pointer) &b, sizeof(TYPEB));
+
+  printf("\n");
+
+  printf("Values for a OPER b:\n");
+  printf("  On disk: ");
+  show_bytes((byte_pointer) &c, sizeof(TYPEB));
+  printf("  In order: ");
+  show_bytes_in_order((byte_pointer) &c, sizeof(TYPEB));
+  printf("  Bits: ");
+  print_all_bytes((byte_pointer) &c, sizeof(TYPEB));
+
+  printf("\n");
+
+  return 0;
+}
+EOF
+
+}
+
+pre-process () {
+
+sed -i "s/TYPEA/${TYPEA}/g" ${BUILD_DIR}/main.c
+sed -i "s/TYPEB/${TYPEB}/g" ${BUILD_DIR}/main.c
+sed -i "s/NUMA/${NUMA}/g" ${BUILD_DIR}/main.c
+sed -i "s/NUMB/${NUMB}/g" ${BUILD_DIR}/main.c
+sed -i "s/OPER/${OPER}/g" ${BUILD_DIR}/main.c
+
+}
+
+build () {
+
+cd ${BUILD_DIR}
+
+gcc -c bitviewer.c
+gcc -c main.c
+
+gcc bitviewer.o main.o -o bitviewer
+
+}
+
+clean () {
+
+rm ${BUILD_DIR}/*.o
+rm ${BUILD_DIR}/bitviewer
+rm ${BUILD_DIR}/main.c
+
+}
+
+run-bitviewer () {
+
+${BUILD_DIR}/bitviewer
+
+}
+
+get-user-input () {
+
+echo "Input a:"
+read NUMA
+
+echo
+
+echo "Input b:"
+read NUMB
+
+echo
+
+echo "Type a:"
+read TYPEA
+
+echo
+
+echo "Type b:"
+read TYPEB
+
+echo
+
+echo "Input operation:"
+read OPER
+
+echo
+
+export NUMA
+export NUMB
+export OPER
+
+}
+
+get-user-input
+
+create-template
+pre-process
+
+build
+
+run-bitviewer
+
+clean
