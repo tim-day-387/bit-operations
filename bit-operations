@@ -7,42 +7,18 @@ create-template () {
 cat > ${BUILD_DIR}/main.c <<EOF
 #include <stdio.h>
 
-#include "bitviewer.h"
+#include "printer.h"
 
 int main(int argc, char *argv[]) {
   TYPEA a = NUMA;
+  size_t a_size = sizeof(TYPEA);
   TYPEB b = NUMB;
+  size_t b_size = sizeof(TYPEB);
   TYPEB c = a OPER b;
 
-  printf("Values for a:\n");
-  printf("  On disk: ");
-  show_bytes((byte_pointer) &a, sizeof(TYPEA));
-  printf("  In order: ");
-  show_bytes_in_order((byte_pointer) &a, sizeof(TYPEA));
-  printf("  Bits: ");
-  print_all_bytes((byte_pointer) &a, sizeof(TYPEA));
-
-  printf("\n");
-
-  printf("Values for b:\n");
-  printf("  On disk: ");
-  show_bytes((byte_pointer) &b, sizeof(TYPEB));
-  printf("  In order: ");
-  show_bytes_in_order((byte_pointer) &b, sizeof(TYPEB));
-  printf("  Bits: ");
-  print_all_bytes((byte_pointer) &b, sizeof(TYPEB));
-
-  printf("\n");
-
-  printf("Values for a OPER b:\n");
-  printf("  On disk: ");
-  show_bytes((byte_pointer) &c, sizeof(TYPEB));
-  printf("  In order: ");
-  show_bytes_in_order((byte_pointer) &c, sizeof(TYPEB));
-  printf("  Bits: ");
-  print_all_bytes((byte_pointer) &c, sizeof(TYPEB));
-
-  printf("\n");
+  show_all_info("a", (byte_pointer) &a, a_size);
+  show_all_info("b", (byte_pointer) &b, b_size);
+  show_all_info("a OPER b", (byte_pointer) &c, b_size);
 
   return 0;
 }
@@ -64,10 +40,11 @@ build () {
 
 cd ${BUILD_DIR}
 
+gcc -c printer.c
 gcc -c bitviewer.c
 gcc -c main.c
 
-gcc bitviewer.o main.o -o bitviewer
+gcc printer.o bitviewer.o main.o -o bitviewer
 
 }
 
