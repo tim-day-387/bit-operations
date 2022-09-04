@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "bitviewer.h"
+#include "bitviewer/bitviewer.h"
 #include "printer.h"
 
 void show_all_info(char title[], byte_pointer start, size_t len) {

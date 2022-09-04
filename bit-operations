@@ -7,7 +7,7 @@ create-template () {
 cat > ${BUILD_DIR}/main.c <<EOF
 #include <stdio.h>
 
-#include "printer.h"
+#include "printer/printer.h"
 
 int main(int argc, char *argv[]) {
   TYPEA a = NUMA;
@@ -40,25 +40,25 @@ build () {
 
 cd ${BUILD_DIR}
 
-gcc -c printer.c
-gcc -c bitviewer.c
-gcc -c main.c
+gcc -I. -c printer/printer.c
+gcc -I. -c bitviewer/bitviewer.c
+gcc -I. -c main.c
 
-gcc printer.o bitviewer.o main.o -o bitviewer
+gcc printer.o bitviewer.o main.o -o query_program
 
 }
 
 clean () {
 
 rm ${BUILD_DIR}/*.o
-rm ${BUILD_DIR}/bitviewer
+rm ${BUILD_DIR}/query_program
 rm ${BUILD_DIR}/main.c
 
 }
 
-run-bitviewer () {
+run-query_program () {
 
-${BUILD_DIR}/bitviewer
+${BUILD_DIR}/query_program
 
 }
 
@@ -102,6 +102,6 @@ pre-process
 
 build
 
-run-bitviewer
+run-query_program
 
 clean
